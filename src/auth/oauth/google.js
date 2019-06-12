@@ -8,7 +8,6 @@ const GTS = 'https://www.googleapis.com/oauth2/v4/token';
 const SERVICE = 'https://www.googleapis.com/plus/v1/people/me/openIdConnect';
 
 let authorize = (request) => {
-  
   console.log('(1)', request.query.code);
   
   return superagent.post(GTS)
@@ -21,11 +20,13 @@ let authorize = (request) => {
       grant_type: 'authorization_code',
     })
     .then( response => {
+      console.log('1.: ', response);
       let access_token = response.body.access_token;
       console.log('(2)', access_token);
       return access_token;
     })
     .then(token => {
+      console.log('2: ', token);
       console.log(SERVICE, token);
       return superagent.get(SERVICE)
         .set('Authorization', `Bearer ${token}`)
@@ -36,10 +37,12 @@ let authorize = (request) => {
         });
     })
     .then( oauthUser => {
+      console.log('3: ', oauthUser);
       console.log('(4) Create Our Account');
       return Users.createFromOauth(oauthUser.email);
     })
     .then( actualUser => {
+      console.log('4: ', actualUser);
       return actualUser.generateToken(); 
     })
     .catch( error => error );
